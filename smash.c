@@ -105,6 +105,7 @@ int parseCommand(char** argv, int argC) {
 			//add the given string to the start of the path	
 			//add a space to the end of the string for easy parsing between paths
 			char *addToken = argv[2];
+			//TODO:check for segfaults here
 			strcat(addToken," ");
 			strcat(addToken,path);
 			path = addToken;
@@ -133,6 +134,34 @@ int parseCommand(char** argv, int argC) {
 		}
 		//user called path without a known command
 		throwErr();
+	}
+	//TODO:in the future check for error in num of args
+	//means it must be a non built in command 
+	else {
+		int valid = 0;
+		char *token;
+		char *pathDup = strdup(path);
+        	while ((token = strsep(&pathDup, " ")) != NULL) {
+        		//TODO:check for segfaults here
+			printf("lol\n");
+			char *newPth = malloc(sizeof(token)+sizeof(argv[0])+1);
+			strcat(newPth,token);
+			//TODO: not sure if we handle like this
+			if (newPth[strlen(newPth)-1] != '/') {
+				strcat(newPth,"/");
+			}
+			strcat(newPth,argv[0]);
+			if (access(newPth,X_OK) != -1) {
+				valid = 1;
+			}
+			free(newPth);
+		
+		}
+		//no access to the file
+		if (valid == 0) {
+			throwErr();
+		}
+
 	}
 	return 1;
 }
