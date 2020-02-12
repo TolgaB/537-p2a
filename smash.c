@@ -8,7 +8,7 @@
 //define funcs
 int parseCommand(char **argv, int argC);
 int removePath(char *rmStr);
-int runProg(char *progPth, char **progArgs);
+int runProg(char *progPth, char **progArgs,int progArgC);
 void throwErr();
 
 
@@ -145,7 +145,6 @@ int parseCommand(char** argv, int argC) {
 		char *pathDup = strdup(path);
         	while ((token = strsep(&pathDup, " ")) != NULL) {
         		//TODO:check for segfaults here
-			printf("lol\n");
 			char *newPth = malloc(sizeof(token)+sizeof(argv[0])+1);
 			strcat(newPth,token);
 			//TODO: not sure if we handle like this
@@ -155,7 +154,7 @@ int parseCommand(char** argv, int argC) {
 			strcat(newPth,argv[0]);
 			if (access(newPth,X_OK) != -1) {
 				valid = 1;
-				runProg(newPth,argv);
+				runProg(newPth,argv,argC);
 			}
 			free(newPth);
 		
@@ -170,18 +169,21 @@ int parseCommand(char** argv, int argC) {
 }
 
 
-int runProg(char *progPth,char **progArgs) {
+int runProg(char *progPth,char **progArgs,int progArgC) {
 	//create the child process
 	int rc = fork();
 	if (rc == 0) {
+		char **pgAr = malloc(sizeof(char *) * (progArgC+1));
 		//have the child process run the prog
-	 	char **pgAr = malloc(sizeof(progArgs)+sizeof(progArgs[0]));
-		int num = sizeof(progArgs)/sizeof(progArgs[0]);
-		for (int i = 0; i < num; i++) {
+		for (int i = 0; i < progArgC; i++) {
 			pgAr[i] = progArgs[i];
 		}
-		pgAr[num] = NULL;
-		execv(progPth,progArgs);
+		//overwrite path with right string
+		pgAr[0] = progPth;
+		pgAr[progArgC] = NULL;
+		if (execv(progPth,pgAr) == -1) {
+			throwErr();
+		}
 	} else {
 		int rc_wait = wait(NULL);
 	}
