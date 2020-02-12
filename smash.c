@@ -12,7 +12,7 @@ int parseCommand(char **argv, int argC);
 int removePath(char *rmStr);
 int runProg(char *progPth, char **progArgs,int progArgC);
 char *removeWhiteSpace(char *str);
-void throwErr();
+void throwErr(int exitErr);
 
 
 //default values
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 		//read from an input file
 		fp = fopen(argv[1],"r");
 		if (fp == NULL) {
-			throwErr();
+			throwErr(1);
 		}
 	}
 	//Loop through the input
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
 						childPid[child] = rc;
 						child++;
 					}
-                                        if (rc == 0) {	
+                                        if (rc == 0) {
                                                 //the child process
                                                 parseCommand(inputArr,place);
                                         }
@@ -117,35 +117,34 @@ int parseCommand(char** argv, int argC) {
 	if ((strcmp(argv[0],"exit") == 0)) {
 		//if args supplied after exit throw error
 		if (argC != 1) {
-			throwErr();
+			throwErr(0);
 		}
 		exit(0);
 	}
 	else if ((strcmp(argv[0],"cd") == 0)) {
 		if (argC != 2) {
-			throwErr();
+			throwErr(0);
 		}
 		//first check if it can be accessed
-		if (access(argv[1],F_OK | X_OK) == 0) {
+		else if (access(argv[1],F_OK | X_OK) == 0) {
 			if (chdir(argv[1]) == -1) {
-				throwErr();
+				throwErr(0);
 			}
-			return 0;
 		} else {
-			//TODO:Not sure if this counts as an error
-			throwErr();
+			throwErr(0);
 		}
+		return 0;
 	}
 	else if (strcmp(argv[0],"path") == 0) {
 		if (argC < 2) {
-			throwErr();
+			throwErr(0);
 		}
 		//various implementation of path command
 		
 		//add implementation
 		if (strcmp(argv[1],"add") == 0) {
 			if (argC != 3) {
-				throwErr();
+				throwErr(0);
 			}
 			//add the given string to the start of the path	
 			//add a space to the end of the string for easy parsing between paths
@@ -154,29 +153,27 @@ int parseCommand(char** argv, int argC) {
 			strcat(addToken," ");
 			strcat(addToken,path);
 			path = addToken;
-			return 0;
 		}
 		if (strcmp(argv[1],"clear") == 0) {
 			if (argC != 2) {
-				throwErr();
+				throwErr(0);
 			}
 			//clear the path so that nothing other than built-ins can be run
 			path = "";
-			return 1;
 		}
 		if (strcmp(argv[1],"remove") == 0) {
 			if (argC != 3) {
-				throwErr();
+				throwErr(0);
 			}
 			//remove the given string from the path
 			if(removePath(argv[2]) == -1) {
 				//error statement
-				throwErr();
+				throwErr(0);
 			}
-			return 1;
 		}
 		//user called path without a known command
-		throwErr();
+		throwErr(0);
+		return 0;
 	}
 	//TODO:in the future check for error in num of args
 	//means it must be a non built in command 
@@ -196,18 +193,18 @@ int parseCommand(char** argv, int argC) {
 			if (access(newPth,X_OK) != -1) {
 				valid = 1;
 				runProg(newPth,argv,argC);
+				throwErr(1);
 			}
-			free(newPth);
-		
+			free(newPth);	
 		}
 		//no access to the file
 		if (valid == 0) {
-			throwErr();
+			throwErr(1);
 		}
-
+		return 0;
 	}
 	//should never get to the end of the func
-	throwErr();
+	throwErr(0);
 	return 1;
 }
 
@@ -220,7 +217,9 @@ int runProg(char *progPth,char **progArgs,int progArgC) {
 			pgAr[i] = progArgs[i];
 		}
 		//overwrite path with right string
-		pgAr[0] = progPth;
+		//pgAr[0] = progPth;
+		//^^piazza said this
+		
 		pgAr[progArgC] = NULL;
 		if (execv(progPth,pgAr) == -1) {
 			//free the part of memory that was allocated on the heap
@@ -228,7 +227,7 @@ int runProg(char *progPth,char **progArgs,int progArgC) {
 				free(pgAr[i]);
 			}
 			free(pgAr);
-			throwErr();
+			throwErr(1);
 		}
 }
 
@@ -274,8 +273,10 @@ char *removeWhiteSpace(char *str) {
 }
 
 
-void throwErr() {
+void throwErr(int exitErr) {
 	char error_message[30] = "An error has occurred\n";
         write(STDERR_FILENO, error_message, strlen(error_message));
-        exit(1);
+        if (exitErr == 1) {
+		exit(1);
+	}
 }
