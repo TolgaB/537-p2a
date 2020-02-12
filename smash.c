@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
 		while ((cmdToken = strsep(&line, ";")) != NULL) {
 			//take out the whitespaces
 			removeWhiteSpace(cmdToken);
+			printf("CMD-TOKEN: %s\n", cmdToken);
 			//now look for & statements
 			int secPlace = 0;
 			char **parArr = malloc(sizeof(char *) * strlen(cmdToken));
@@ -63,6 +64,9 @@ int main(int argc, char** argv) {
 				parArr[secPlace] = removeWhiteSpace(parToken);
 				secPlace++;
 			}
+			//TODO: NEED TO FREE MEM
+			int *childPid = malloc(sizeof(int) * secPlace);
+			int child = 0;
 			int rc;
 			int builtin = 0;
 			//need to loop through parArr
@@ -76,27 +80,29 @@ int main(int argc, char** argv) {
                                 	place++;
                         	}
 				//TODO: CAN BUILT INS BE RUN PARALLEL?
-				if ((strcmp(inputArr[0],"exit") == 0) | (strcmp(inputArr[0],"cd") == 0) | (strcmp(inputArr[0],"path") == 0)) {
+				if ((strcmp(inputArr[0],"exit") == 0) || (strcmp(inputArr[0],"cd") == 0) || (strcmp(inputArr[0],"path") == 0)) {
                                         builtin = 1;
 					parseCommand(inputArr,place);		
 				} else {
 					//TODO: prob have to rewrite this to do the commands in the function
 					//run the command in a manner that they can be executed parallely
 					rc = fork();
-                                        if (rc == 0) {
+					if (rc != 0) {
+						childPid[child] = rc;
+						child++;
+					}
+                                        if (rc == 0) {	
                                                 printf("running cmd\n");
                                                 //the child process
                                                 parseCommand(inputArr,place);
-						exit(0);
+						printf("NEVER RUN\n");
                                         }
 				}
 			}
 			if ((rc != 0) && (builtin == 0)) {
 				//parent process
-				while (waitpid(-1,NULL,0)) {
-					if (errno == ECHILD) {
-						break;
-					}
+				while ((rc = waitpid(-1,NULL,0)) != -1) {
+					printf("%d PS DIED\n",rc);
 				}
 			}
 		}
@@ -129,6 +135,7 @@ int parseCommand(char** argv, int argC) {
 			if (chdir(argv[1]) == -1) {
 				throwErr();
 			}
+			return 0;
 		} else {
 			//TODO:Not sure if this counts as an error
 			throwErr();
@@ -204,12 +211,15 @@ int parseCommand(char** argv, int argC) {
 		}
 
 	}
+	//should never get to the end of the func
+	throwErr();
 	return 1;
 }
 
 
 int runProg(char *progPth,char **progArgs,int progArgC) {
-	//create the child process
+		printf("runProg\n");
+		//create the child process
 		char **pgAr = malloc(sizeof(char *) * (progArgC+1));
 		//have the child process run the prog
 		for (int i = 0; i < progArgC; i++) {
