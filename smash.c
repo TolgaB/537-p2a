@@ -53,13 +53,23 @@ int main(int argc, char** argv) {
 		int place = 0;
 		char **cmdArr = malloc(sizeof(char *) * strlen(line));
 		char *cmdToken;
+		//commands that are run one after the other
 		while ((cmdToken = strsep(&line, ";")) != NULL) {
+			//take out the whitespaces
 			cmdArr[place] = removeWhiteSpace(cmdToken);
+			//now look for & statements
+			int secPlace = 0;
+			char **parArr = malloc(sizeof(char *) * strlen(cmdArr[place]));
+			char *parToken;
+			while ((parToken = strsep(&cmdArr[place],"&"))) {
+				parArr[secPlace] = removeWhiteSpace(parToken);
+				secPlace++;
+			}
+			//now we run parse the commands and run them
+			
 			place++;	
 		}
-		printf("%s\n",cmdArr[0]);
-		printf("%s\n",cmdArr[1]);
-		//remove spaces at the beginning and end of commands
+
 		
 		//parse the input into constituent string
 		//TODO:THIS CANNOT BE HARDCODED IN SIZE IT WILL CAUSE ERRORS IN THE FUTURE
@@ -76,6 +86,7 @@ int main(int argc, char** argv) {
 		}
 		//TODO: proper freeing of allocated mem
 		free(inputArr);
+		free(cmdArr);
 		if (batchMode == 0) {
 			printf("smash> ");
 		}
