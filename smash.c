@@ -5,11 +5,13 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <ctype.h>
 
 //define funcs
 int parseCommand(char **argv, int argC);
 int removePath(char *rmStr);
 int runProg(char *progPth, char **progArgs,int progArgC);
+char *removeWhiteSpace(char *str);
 void throwErr();
 
 
@@ -48,12 +50,20 @@ int main(int argc, char** argv) {
 		line[strlen(line)-1] = '\0';
 		
 		//first parse to see if semicolon commands exist
+		int place = 0;
+		char **cmdArr = malloc(sizeof(char *) * strlen(line));
+		char *cmdToken;
+		while ((cmdToken = strsep(&line, ";")) != NULL) {
+			cmdArr[place] = removeWhiteSpace(cmdToken);
+			place++;	
+		}
+		printf("%s\n",cmdArr[0]);
+		printf("%s\n",cmdArr[1]);
+		//remove spaces at the beginning and end of commands
 		
-
-
 		//parse the input into constituent string
 		//TODO:THIS CANNOT BE HARDCODED IN SIZE IT WILL CAUSE ERRORS IN THE FUTURE
-		int place = 0;
+		place = 0;
 		char **inputArr = malloc(sizeof(char *) * strlen(line));
 		char *token;
 		while ((token = strsep(&line, " ")) != NULL) {
@@ -232,6 +242,19 @@ int removePath(char *rmStr) {
 	return 0;
 }
 
+//method created with help from stackoverflow
+char *removeWhiteSpace(char *str) {
+	//remove from front
+	while((isspace((unsigned char)*str))) {
+		str++;
+	}
+	char *end = str + (strlen(str))-1;
+	while(end > str && isspace((unsigned char)*end)) {
+		end--;
+	}
+	end[1] = '\0';
+	return str;
+}
 
 
 void throwErr() {
