@@ -46,13 +46,15 @@ int main(int argc, char** argv) {
 	while (getline(&line, &linecap, fp) != -1) {
 		//remove the '\n' at the end of line
 		line[strlen(line)-1] = '\0';
+		
+		//first parse to see if semicolon commands exist
+		
+
+
 		//parse the input into constituent string
-		int place = 0;
-		//TODO:THIS MIGHT MISS OUT ON THE FIRST COMMAND IF THERE ARE NO SPACES AFTER
-
-
 		//TODO:THIS CANNOT BE HARDCODED IN SIZE IT WILL CAUSE ERRORS IN THE FUTURE
-		char *inputArr[100];
+		int place = 0;
+		char **inputArr = malloc(sizeof(char *) * strlen(line));
 		char *token;
 		while ((token = strsep(&line, " ")) != NULL) {
 			inputArr[place] = token;
@@ -62,6 +64,8 @@ int main(int argc, char** argv) {
 		if (parseCommand(inputArr,place) != 1) {
 			//dont know what to say
 		}
+		//TODO: proper freeing of allocated mem
+		free(inputArr);
 		if (batchMode == 0) {
 			printf("smash> ");
 		}
@@ -91,6 +95,9 @@ int parseCommand(char** argv, int argC) {
 			if (chdir(argv[1]) == -1) {
 				throwErr();
 			}
+		} else {
+			//TODO:Not sure if this counts as an error
+			throwErr();
 		}
 	}
 	else if (strcmp(argv[0],"path") == 0) {
