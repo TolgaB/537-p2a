@@ -55,7 +55,6 @@ int main(int argc, char** argv) {
 		while ((cmdToken = strsep(&line, ";")) != NULL) {
 			//take out the whitespaces
 			removeWhiteSpace(cmdToken);
-			printf("CMD-TOKEN: %s\n", cmdToken);
 			//now look for & statements
 			int secPlace = 0;
 			char **parArr = malloc(sizeof(char *) * strlen(cmdToken));
@@ -92,21 +91,17 @@ int main(int argc, char** argv) {
 						child++;
 					}
                                         if (rc == 0) {	
-                                                printf("running cmd\n");
                                                 //the child process
                                                 parseCommand(inputArr,place);
-						printf("NEVER RUN\n");
                                         }
 				}
 			}
 			if ((rc != 0) && (builtin == 0)) {
 				//parent process
 				while ((rc = waitpid(-1,NULL,0)) != -1) {
-					printf("%d PS DIED\n",rc);
 				}
 			}
 		}
-		printf("passed out\n");
 		//TODO: proper freeing of allocated mem
 		if (batchMode == 0) {
 			printf("smash> ");
@@ -218,7 +213,6 @@ int parseCommand(char** argv, int argC) {
 
 
 int runProg(char *progPth,char **progArgs,int progArgC) {
-		printf("runProg\n");
 		//create the child process
 		char **pgAr = malloc(sizeof(char *) * (progArgC+1));
 		//have the child process run the prog
