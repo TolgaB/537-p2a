@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 //define funcs
 int parseCommand(char **argv, int argC);
@@ -79,21 +80,20 @@ int parseCommand(char** argv, int argC) {
 		}
 		exit(0);
 	}
-	if ((strcmp(argv[0],"cd") == 0)) {
+	else if ((strcmp(argv[0],"cd") == 0)) {
 		if (argC != 2) {
 			//not correct usage of cd
 			printf("USAGE:cd [dirName]\n");
 			return 0;
 		}
-		printf("HMM: %s\n", argv[1]);
-		char s[100];
-		printf("%s\n", getcwd(s, 100));
-		//implementation of cd
-		if (chdir(argv[1]) == -1) {
-			throwErr();
+		//first check if it can be accessed
+		if (access(argv[1],F_OK | X_OK) == 0) {
+			if (chdir(argv[1]) == -1) {
+				throwErr();
+			}
 		}
 	}
-	if (strcmp(argv[0],"path") == 0) {
+	else if (strcmp(argv[0],"path") == 0) {
 		if (argC < 2) {
 			//not correct usage of path
 			printf("USAGE:path [arg] [opt-arg]\n");
@@ -185,6 +185,11 @@ int runProg(char *progPth,char **progArgs,int progArgC) {
 		pgAr[0] = progPth;
 		pgAr[progArgC] = NULL;
 		if (execv(progPth,pgAr) == -1) {
+			//free the part of memory that was allocated on the heap
+			for (int i = 0; i < (progArgC+1); i++) {
+				free(pgAr[i]);
+			}
+			free(pgAr);
 			throwErr();
 		}
 	} else {
