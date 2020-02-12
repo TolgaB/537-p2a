@@ -3,10 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 //define funcs
 int parseCommand(char **argv, int argC);
 int removePath(char *rmStr);
+int runProg(char *progPth, char **progArgs);
 void throwErr();
 
 
@@ -153,6 +155,7 @@ int parseCommand(char** argv, int argC) {
 			strcat(newPth,argv[0]);
 			if (access(newPth,X_OK) != -1) {
 				valid = 1;
+				runProg(newPth,argv);
 			}
 			free(newPth);
 		
@@ -165,6 +168,28 @@ int parseCommand(char** argv, int argC) {
 	}
 	return 1;
 }
+
+
+int runProg(char *progPth,char **progArgs) {
+	//create the child process
+	int rc = fork();
+	if (rc == 0) {
+		//have the child process run the prog
+	 	char **pgAr = malloc(sizeof(progArgs)+sizeof(progArgs[0]));
+		int num = sizeof(progArgs)/sizeof(progArgs[0]);
+		for (int i = 0; i < num; i++) {
+			pgAr[i] = progArgs[i];
+		}
+		pgAr[num] = NULL;
+		execv(progPth,progArgs);
+	} else {
+		int rc_wait = wait(NULL);
+	}
+
+}
+
+
+
 
 //TODO:FIX THIS METHOD TO WORK
 //return -1 if not found
