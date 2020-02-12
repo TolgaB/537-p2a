@@ -63,6 +63,8 @@ int main(int argc, char** argv) {
 				parArr[secPlace] = removeWhiteSpace(parToken);
 				secPlace++;
 			}
+			int rc;
+			int builtin = 0;
 			//need to loop through parArr
 			for (int i = 0; i < secPlace;i++) {
 				//now we run parse the commands and run them
@@ -73,12 +75,32 @@ int main(int argc, char** argv) {
                                 	inputArr[place] = token;
                                 	place++;
                         	}
-                       		//run the command in a manner that they can be executed parallely
-                        	if (parseCommand(inputArr,place) != 1) {
-                                	//dont know what to say
-                        	}
+				//TODO: CAN BUILT INS BE RUN PARALLEL?
+				if ((strcmp(inputArr[0],"exit") == 0) | (strcmp(inputArr[0],"cd") == 0) | (strcmp(inputArr[0],"path") == 0)) {
+                                        builtin = 1;
+					parseCommand(inputArr,place);		
+				} else {
+					//TODO: prob have to rewrite this to do the commands in the function
+					//run the command in a manner that they can be executed parallely
+					rc = fork();
+                                        if (rc == 0) {
+                                                printf("running cmd\n");
+                                                //the child process
+                                                parseCommand(inputArr,place);
+						exit(0);
+                                        }
+				}
+			}
+			if ((rc != 0) && (builtin == 0)) {
+				//parent process
+				while (waitpid(-1,NULL,0)) {
+					if (errno == ECHILD) {
+						break;
+					}
+				}
 			}
 		}
+		printf("passed out\n");
 		//TODO: proper freeing of allocated mem
 		if (batchMode == 0) {
 			printf("smash> ");
@@ -100,9 +122,7 @@ int parseCommand(char** argv, int argC) {
 	}
 	else if ((strcmp(argv[0],"cd") == 0)) {
 		if (argC != 2) {
-			//not correct usage of cd
-			printf("USAGE:cd [dirName]\n");
-			return 0;
+			throwErr();
 		}
 		//first check if it can be accessed
 		if (access(argv[1],F_OK | X_OK) == 0) {
@@ -116,17 +136,14 @@ int parseCommand(char** argv, int argC) {
 	}
 	else if (strcmp(argv[0],"path") == 0) {
 		if (argC < 2) {
-			//not correct usage of path
-			printf("USAGE:path [arg] [opt-arg]\n");
-			return 0;
+			throwErr();
 		}
 		//various implementation of path command
 		
 		//add implementation
 		if (strcmp(argv[1],"add") == 0) {
 			if (argC != 3) {
-				printf("USAGE:path add [arg]\n");
-				return 0;
+				throwErr();
 			}
 			//add the given string to the start of the path	
 			//add a space to the end of the string for easy parsing between paths
@@ -139,8 +156,7 @@ int parseCommand(char** argv, int argC) {
 		}
 		if (strcmp(argv[1],"clear") == 0) {
 			if (argC != 2) {
-				printf("USAGE:path clear\n");
-				return 0;
+				throwErr();
 			}
 			//clear the path so that nothing other than built-ins can be run
 			path = "";
@@ -148,8 +164,7 @@ int parseCommand(char** argv, int argC) {
 		}
 		if (strcmp(argv[1],"remove") == 0) {
 			if (argC != 3) {
-				printf("USAGE:path remove [arg]\n");
-				return 0;
+				throwErr();
 			}
 			//remove the given string from the path
 			if(removePath(argv[2]) == -1) {
@@ -195,8 +210,6 @@ int parseCommand(char** argv, int argC) {
 
 int runProg(char *progPth,char **progArgs,int progArgC) {
 	//create the child process
-	int rc = fork();
-	if (rc == 0) {
 		char **pgAr = malloc(sizeof(char *) * (progArgC+1));
 		//have the child process run the prog
 		for (int i = 0; i < progArgC; i++) {
@@ -213,10 +226,6 @@ int runProg(char *progPth,char **progArgs,int progArgC) {
 			free(pgAr);
 			throwErr();
 		}
-	} else {
-		int rc_wait = wait(NULL);
-	}
-
 }
 
 
