@@ -85,6 +85,9 @@ int parseCommand(char** argv, int argC) {
 			printf("USAGE:cd [dirName]\n");
 			return 0;
 		}
+		printf("HMM: %s\n", argv[1]);
+		char s[100];
+		printf("%s\n", getcwd(s, 100));
 		//implementation of cd
 		if (chdir(argv[1]) == -1) {
 			throwErr();
