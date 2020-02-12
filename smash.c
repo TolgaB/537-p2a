@@ -50,43 +50,36 @@ int main(int argc, char** argv) {
 		line[strlen(line)-1] = '\0';
 		
 		//first parse to see if semicolon commands exist
-		int place = 0;
-		char **cmdArr = malloc(sizeof(char *) * strlen(line));
 		char *cmdToken;
 		//commands that are run one after the other
 		while ((cmdToken = strsep(&line, ";")) != NULL) {
 			//take out the whitespaces
-			cmdArr[place] = removeWhiteSpace(cmdToken);
+			removeWhiteSpace(cmdToken);
 			//now look for & statements
 			int secPlace = 0;
-			char **parArr = malloc(sizeof(char *) * strlen(cmdArr[place]));
+			char **parArr = malloc(sizeof(char *) * strlen(cmdToken));
 			char *parToken;
-			while ((parToken = strsep(&cmdArr[place],"&"))) {
+			while ((parToken = strsep(&cmdToken,"&"))) {
 				parArr[secPlace] = removeWhiteSpace(parToken);
 				secPlace++;
 			}
-			//now we run parse the commands and run them
-			
-			place++;	
-		}
-
-		
-		//parse the input into constituent string
-		//TODO:THIS CANNOT BE HARDCODED IN SIZE IT WILL CAUSE ERRORS IN THE FUTURE
-		place = 0;
-		char **inputArr = malloc(sizeof(char *) * strlen(line));
-		char *token;
-		while ((token = strsep(&line, " ")) != NULL) {
-			inputArr[place] = token;
-			place++;
-		}
-		//run the command
-		if (parseCommand(inputArr,place) != 1) {
-			//dont know what to say
+			//need to loop through parArr
+			for (int i = 0; i < secPlace;i++) {
+				//now we run parse the commands and run them
+                        	int place = 0;
+				char **inputArr = malloc(sizeof(char *) * strlen(parArr[i]));
+                        	char *token;
+                        	while ((token = strsep(&parArr[i], " ")) != NULL) {
+                                	inputArr[place] = token;
+                                	place++;
+                        	}
+                       		//run the command in a manner that they can be executed parallely
+                        	if (parseCommand(inputArr,place) != 1) {
+                                	//dont know what to say
+                        	}
+			}
 		}
 		//TODO: proper freeing of allocated mem
-		free(inputArr);
-		free(cmdArr);
 		if (batchMode == 0) {
 			printf("smash> ");
 		}
