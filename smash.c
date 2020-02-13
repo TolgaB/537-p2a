@@ -10,10 +10,10 @@
 //define funcs
 int parseCommand(char **argv, int argC, int outputToFile, char *outputFileName);
 int removePath(char *rmStr);
-int runProg(char *progPth, char **progArgs,int progArgC, int outputToFile, char *outputFileName);
+int runProg(char *newPth, char **progArgs,int progArgC, int outputToFile, char *outputFileName);
 char *removeWhiteSpace(char *str);
 void throwErr(int exitErr);
-
+int getInput(FILE *fp, int batchMode);
 
 //default values
 char *path = "/bin";
@@ -27,11 +27,8 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 	//loop through waiting for user input
-	int batchMode = 0;
-        char *line = NULL;
-        size_t linecap = 0;
-        size_t linelen;
         FILE *fp = stdin;
+	int batchMode = 0;
 	if (argc == 2) {
 		batchMode = 1;
 		//read from an input file
@@ -40,132 +37,37 @@ int main(int argc, char** argv) {
 			throwErr(1);
 		}
 	}
-	//Loop through the input
-	printf("smash> ");
-	//need to implement EOF thingy
-	while ((getline(&line, &linecap, fp) != -1)) {
-		//remove the '\n' at the end of line
-		line[strlen(line)-1] = '\0';
-		
-		//first parse to see if semicolon commands exist
-		char *cmdToken;
-		//commands that are run one after the other
-		while ((cmdToken = strsep(&line, ";")) != NULL) {
-			//take out the whitespaces
-			removeWhiteSpace(cmdToken);
-			int outputToFile = 0;
-			int incorrectInput = 0;
-			//look for redirection
-			int redPlace = 0;
-			char **redArr = malloc(sizeof(char *) * 2);
-			char *redToken;
-			while ((redToken = strsep(&cmdToken,">"))) {
-				if (redPlace >= 2) {
-					//wont be able to leave the func?
-					incorrectInput = 1;
-					throwErr(0);
-				}
-				redArr[redPlace] = removeWhiteSpace(redToken);
-				redPlace++;
-			}
-			if (incorrectInput) continue;
-	
-			char *outputFileName;
-			//make sure that only one file is given if output
-			if (redPlace > 1) {
-				//we now know that all outputs should go to specified file
-				outputToFile = 1;
-				//make sure that there is only one output file
-				//TODO: is more then one output file an end prog error?
-				char *outputCopy = strdup(redArr[1]);
-				char *outputToken;
-				int num = 0;
-				while ((outputToken = strsep(&outputCopy, " "))) {
-					outputFileName = outputToken;
-					num++;
-				}
-				if (num > 1) {
-					incorrectInput = 1;
-				}
-			}
-				
-			if (incorrectInput) {
-				throwErr(0);
-				continue;
-			}
-			
-			//now look for & statements
-			int secPlace = 0;
-			char **parArr = malloc(sizeof(char *) * strlen(redArr[0]));
-			char *parToken;
-			while ((parToken = strsep(&redArr[0],"&"))) {
-				parArr[secPlace] = removeWhiteSpace(parToken);
-				secPlace++;
-			}
-			//TODO: NEED TO FREE MEM
-			int *childPid = malloc(sizeof(int) * secPlace);
-			int child = 0;
-			int rc;
-			int builtin = 0;
-			//need to loop through parArr
-			for (int i = 0; i < secPlace;i++) {
-				//now we run parse the commands and run them
-                        	int place = 0;
-				char **inputArr = malloc(sizeof(char *) * strlen(parArr[i]));
-                        	char *token;
-                        	while ((token = strsep(&parArr[i], " ")) != NULL) {
-                                	inputArr[place] = token;
-                                	place++;
-                        	}
-				//TODO: CAN BUILT INS BE RUN PARALLEL?
-				if ((strcmp(inputArr[0],"exit") == 0) || (strcmp(inputArr[0],"cd") == 0) || (strcmp(inputArr[0],"path") == 0)) {
-                                        builtin = 1;
-					parseCommand(inputArr,place,outputToFile, outputFileName);		
-				} else {
-					//TODO: prob have to rewrite this to do the commands in the function
-					//run the command in a manner that they can be executed parallely
-					rc = fork();
-					if (rc != 0) {
-						childPid[child] = rc;
-						child++;
-					}
-                                        if (rc == 0) {
-                                                //the child process
-                                                parseCommand(inputArr,place,outputToFile, outputFileName);
-                                        }
-				}
-			}
-			if ((rc != 0) && (builtin == 0)) {
-				//parent process
-				while ((rc = waitpid(-1,NULL,0)) != -1) {
-				}
-			}
-		}
-		printf("smash> ");
-	}		
+	getInput(fp, batchMode);
 	return 0;
 }
 
 
-int getInput() {
+int getInput(FILE *fp, int batchMode) {
+	//loop through waiting for user input
+        char *line = NULL;
+        size_t linecap = 0;
+        size_t linelen;
 	//Loop through the input
         printf("smash> ");
+	fflush(stdout);
         //need to implement EOF thingy
-        while ((getline(&line, &linecap, fp) != -1)) {
-                //remove the '\n' at the end of line
-                line[strlen(line)-1] = '\0';
-
+        if ((getline(&line, &linecap, fp) != -1)) {
+	   	//remove the '\n' at the end of line
+		char *lineCopy = strdup(line);
+		if (batchMode) {
+			lineCopy[strlen(lineCopy)-1] = '\0';
+		}
                 //first parse to see if semicolon commands exist
                 char *cmdToken;
                 //commands that are run one after the other
-                while ((cmdToken = strsep(&line, ";")) != NULL) {
+                while ((cmdToken = strsep(&lineCopy, ";")) != NULL) {
                         //take out the whitespaces
                         removeWhiteSpace(cmdToken);
                         int outputToFile = 0;
                         int incorrectInput = 0;
                         //look for redirection
                         int redPlace = 0;
-                        char **redArr = malloc(sizeof(char *) * 2);
+                        char **redArr = malloc(sizeof(char *) * strlen(cmdToken));
                         char *redToken;
                         while ((redToken = strsep(&cmdToken,">"))) {
                                 if (redPlace >= 2) {
@@ -228,11 +130,15 @@ int getInput() {
                                 //TODO: CAN BUILT INS BE RUN PARALLEL?
                                 if ((strcmp(inputArr[0],"exit") == 0) || (strcmp(inputArr[0],"cd") == 0) || (strcmp(inputArr[0],"path") == 0)) {
                                         builtin = 1;
+					if (strcmp(inputArr[0],"exit") == 0) {
+						fclose(fp);
+						free(line);
+					}
                                         parseCommand(inputArr,place,outputToFile, outputFileName);
                                 } else {
                                         //TODO: prob have to rewrite this to do the commands in the function
                                         //run the command in a manner that they can be executed parallely
-                                        rc = fork();
+					rc = fork();
                                         if (rc != 0) {
                                                 childPid[child] = rc;
                                                 child++;
@@ -249,8 +155,9 @@ int getInput() {
                                 }
                         }
                 }
-                printf("smash> ");
+		getInput(fp,batchMode);
         }
+	return 0;
 }
 
 //TODO:READ SPEC FOR ERRORS, most print statements should be errors
@@ -327,7 +234,7 @@ int parseCommand(char** argv, int argC, int outputToFile, char *outputFileName) 
 		char *pathDup = strdup(path);
         	while ((token = strsep(&pathDup, " ")) != NULL) {
         		//TODO:check for segfaults here
-			char *newPth = malloc(sizeof(token)+sizeof(argv[0])+1);
+			char *newPth = malloc(sizeof(token)+sizeof(argv[0])+10);
 			strcat(newPth,token);
 			//TODO: not sure if we handle like this
 			if (newPth[strlen(newPth)-1] != '/') {
@@ -337,7 +244,6 @@ int parseCommand(char** argv, int argC, int outputToFile, char *outputFileName) 
 			if (access(newPth,X_OK) != -1) {
 				valid = 1;
 				runProg(newPth,argv,argC,outputToFile,outputFileName);
-				throwErr(1);
 			}
 			free(newPth);	
 		}
@@ -353,9 +259,9 @@ int parseCommand(char** argv, int argC, int outputToFile, char *outputFileName) 
 }
 
 
-int runProg(char *progPth,char **progArgs,int progArgC, int outputToFile, char *outputFileName) {
+int runProg(char *newPth,char **progArgs,int progArgC, int outputToFile, char *outputFileName) {
 		//create the child process
-		char **pgAr = malloc(sizeof(char *) * (progArgC+1));
+		char **pgAr = malloc(sizeof(char *) * (progArgC+5));
 		//have the child process run the prog
 		for (int i = 0; i < progArgC; i++) {
 			pgAr[i] = progArgs[i];
@@ -367,13 +273,10 @@ int runProg(char *progPth,char **progArgs,int progArgC, int outputToFile, char *
 			dup2(new_fd,2);
 		}
 		pgAr[progArgC] = NULL;
-		if (execv(progPth,pgAr) == -1) {
+		if (execv(newPth,pgAr) == -1) {
 			//free the part of memory that was allocated on the heap
-			for (int i = 0; i < (progArgC+1); i++) {
-				free(pgAr[i]);
-			}
 			free(pgAr);
-			throwErr(1);
+			throwErr(0);
 		}
 }
 
