@@ -258,10 +258,12 @@ int runProg(char *progPth,char **progArgs,int progArgC, int outputToFile, char *
 		for (int i = 0; i < progArgC; i++) {
 			pgAr[i] = progArgs[i];
 		}
-		//overwrite path with right string
-		//pgAr[0] = progPth;
-		//^^piazza said this
-		
+	        if (outputToFile) {
+			FILE *new_f = fopen(outputFileName, "w");
+			int new_fd = fileno(new_f);
+			dup2(new_fd,1);
+			dup2(new_fd,2);
+		}	
 		pgAr[progArgC] = NULL;
 		if (execv(progPth,pgAr) == -1) {
 			//free the part of memory that was allocated on the heap
