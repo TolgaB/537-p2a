@@ -20,7 +20,7 @@ Test cd
 cd with argument, and cd without argument
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test cd PASSED (10 of 10)
@@ -34,7 +34,7 @@ Test badcd
 cd to a bad directory
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test badcd PASSED (5 of 5)
@@ -48,7 +48,7 @@ Test exec
 path should be /bin
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test exec PASSED (5 of 5)
@@ -62,7 +62,7 @@ Test badexec
 run programs that do not exist in /bin
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test badexec PASSED (5 of 5)
@@ -76,19 +76,11 @@ Test path
 run path and a program that exists in a given path
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
-Failure: ./smash returned incorrect status code. Expected 0 got -6
+/tmp/tmpoCZ30j/p/./smash
 
 
-test path FAILED (0 of 5)
+test path PASSED (5 of 5)
  (run path and a program that exists in a given path)
- ./smash returned incorrect status code. Expected 0 got -6
-
- Test it yourself by running
- smash </u/c/s/cs537-1/tests/p2a/path/in
- and check out the test folder
- /u/c/s/cs537-1/tests/p2a/path
- to compare your output with reference outputs. 
 
 starting path2
 
@@ -98,7 +90,7 @@ Test path2
 run path with a long pathname and many different paths
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test path2 PASSED (5 of 5)
@@ -112,7 +104,7 @@ Test line
 line with maximum allowed length
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test line PASSED (5 of 5)
@@ -126,7 +118,7 @@ Test whitespace
 leading and trailing whitespace, full whitespaces or empty string
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test whitespace PASSED (5 of 5)
@@ -140,7 +132,7 @@ Test rdr
 simple redirection with no standard error
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test rdr PASSED (10 of 10)
@@ -154,7 +146,7 @@ Test rdr2
 simple redirection with standard error
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test rdr2 PASSED (5 of 5)
@@ -168,20 +160,11 @@ Test par
 running commands in parallel
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
-Failure: ./smash gave incorrect standard output.
-Expected: "smash> hi\nsmash>"Got:      "smash> smash>"
+/tmp/tmpoCZ30j/p/./smash
 
 
-test par FAILED (0 of 5)
+test par PASSED (5 of 5)
  (running commands in parallel)
- ./smash gave incorrect standard output.
-
- Test it yourself by running
- smash </u/c/s/cs537-1/tests/p2a/par/in
- and check out the test folder
- /u/c/s/cs537-1/tests/p2a/par
- to compare your output with reference outputs. 
 
 starting mul
 
@@ -191,7 +174,7 @@ Test mul
 running multiple commands at once
 
 **********************************************************************
-/tmp/tmphcRjPj/p/./smash
+/tmp/tmpoCZ30j/p/./smash
 
 
 test mul PASSED (5 of 5)
@@ -214,15 +197,8 @@ test exec PASSED (5 of 5)
 test badexec PASSED (5 of 5)
  (run programs that do not exist in /bin)
 
-test path FAILED (0 of 5)
+test path PASSED (5 of 5)
  (run path and a program that exists in a given path)
- ./smash returned incorrect status code. Expected 0 got -6
-
- Test it yourself by running
- smash </u/c/s/cs537-1/tests/p2a/path/in
- and check out the test folder
- /u/c/s/cs537-1/tests/p2a/path
- to compare your output with reference outputs. 
 
 test path2 PASSED (5 of 5)
  (run path with a long pathname and many different paths)
@@ -239,19 +215,12 @@ test rdr PASSED (10 of 10)
 test rdr2 PASSED (5 of 5)
  (simple redirection with standard error)
 
-test par FAILED (0 of 5)
+test par PASSED (5 of 5)
  (running commands in parallel)
- ./smash gave incorrect standard output.
-
- Test it yourself by running
- smash </u/c/s/cs537-1/tests/p2a/par/in
- and check out the test folder
- /u/c/s/cs537-1/tests/p2a/par
- to compare your output with reference outputs. 
 
 test mul PASSED (5 of 5)
  (running multiple commands at once)
 
-Passed 11 of 13 tests.
-Overall 11 of 13
-Points 65 of 75
+Passed 13 of 13 tests.
+Overall 13 of 13
+Points 75 of 75

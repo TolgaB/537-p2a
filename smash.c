@@ -51,7 +51,7 @@ int getInput(FILE *fp, int batchMode) {
         printf("smash> ");
 	fflush(stdout);
         //need to implement EOF thingy
-        if ((getline(&line, &linecap, fp) != -1)) {
+        while ((getline(&line, &linecap, fp) != -1)) {
 	   	//remove the '\n' at the end of line
 		char *lineCopy = strdup(line);
 		if (batchMode) {
@@ -113,8 +113,6 @@ int getInput(FILE *fp, int batchMode) {
                                 secPlace++;
                         }
                         //TODO: NEED TO FREE MEM
-                        int *childPid = malloc(sizeof(int) * secPlace);
-                        int child = 0;
                         int rc;
                         int builtin = 0;
                         //need to loop through parArr
@@ -131,31 +129,34 @@ int getInput(FILE *fp, int batchMode) {
                                 if ((strcmp(inputArr[0],"exit") == 0) || (strcmp(inputArr[0],"cd") == 0) || (strcmp(inputArr[0],"path") == 0)) {
                                         builtin = 1;
 					if (strcmp(inputArr[0],"exit") == 0) {
-						fclose(fp);
-						free(line);
+					//	fclose(fp);
 					}
                                         parseCommand(inputArr,place,outputToFile, outputFileName);
                                 } else {
                                         //TODO: prob have to rewrite this to do the commands in the function
                                         //run the command in a manner that they can be executed parallely
 					rc = fork();
-                                        if (rc != 0) {
-                                                childPid[child] = rc;
-                                                child++;
-                                        }
                                         if (rc == 0) {
-                                                //the child process
+                                                //the child process 
+						//only redirect leftmost
+						if (i != (secPlace-1)) {
+								outputToFile = 0;
+						}
                                                 parseCommand(inputArr,place,outputToFile, outputFileName);
                                         }
                                 }
+				//free(inputArr);
                         }
+			//free(parArr);
+			//free(redArr);
                         if ((rc != 0) && (builtin == 0)) {
                                 //parent process
                                 while ((rc = waitpid(-1,NULL,0)) != -1) {
                                 }
                         }
                 }
-		getInput(fp,batchMode);
+		printf("smash> ");
+		fflush(stdout);
         }
 	return 0;
 }
@@ -234,7 +235,7 @@ int parseCommand(char** argv, int argC, int outputToFile, char *outputFileName) 
 		char *pathDup = strdup(path);
         	while ((token = strsep(&pathDup, " ")) != NULL) {
         		//TODO:check for segfaults here
-			char *newPth = malloc(sizeof(token)+sizeof(argv[0])+10);
+			char *newPth = malloc(sizeof(char) * (sizeof(token)+sizeof(argv[0])+10));
 			strcat(newPth,token);
 			//TODO: not sure if we handle like this
 			if (newPth[strlen(newPth)-1] != '/') {
@@ -245,7 +246,7 @@ int parseCommand(char** argv, int argC, int outputToFile, char *outputFileName) 
 				valid = 1;
 				runProg(newPth,argv,argC,outputToFile,outputFileName);
 			}
-			free(newPth);	
+			//free(newPth);	
 		}
 		//no access to the file
 		if (valid == 0) {
@@ -261,7 +262,7 @@ int parseCommand(char** argv, int argC, int outputToFile, char *outputFileName) 
 
 int runProg(char *newPth,char **progArgs,int progArgC, int outputToFile, char *outputFileName) {
 		//create the child process
-		char **pgAr = malloc(sizeof(char *) * (progArgC+5));
+		char **pgAr = malloc(sizeof(char *) * (progArgC+1));
 		//have the child process run the prog
 		for (int i = 0; i < progArgC; i++) {
 			pgAr[i] = progArgs[i];
