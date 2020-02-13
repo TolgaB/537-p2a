@@ -10,7 +10,7 @@
 //define funcs
 int parseCommand(char **argv, int argC, int outputToFile, char *outputFileName);
 int removePath(char *rmStr);
-int runProg(char *newPth, char **progArgs,int progArgC, int outputToFile, char *outputFileName);
+void runProg(char *newPth, char **progArgs,int progArgC, int outputToFile, char *outputFileName);
 char *removeWhiteSpace(char *str);
 void throwErr(int exitErr);
 int getInput(FILE *fp, int batchMode);
@@ -46,7 +46,6 @@ int getInput(FILE *fp, int batchMode) {
 	//loop through waiting for user input
         char *line = NULL;
         size_t linecap = 0;
-        size_t linelen;
 	//Loop through the input
         printf("smash> ");
 	fflush(stdout);
@@ -260,7 +259,7 @@ int parseCommand(char** argv, int argC, int outputToFile, char *outputFileName) 
 }
 
 
-int runProg(char *newPth,char **progArgs,int progArgC, int outputToFile, char *outputFileName) {
+void runProg(char *newPth,char **progArgs,int progArgC, int outputToFile, char *outputFileName) {
 		//create the child process
 		char **pgAr = malloc(sizeof(char *) * (progArgC+1));
 		//have the child process run the prog

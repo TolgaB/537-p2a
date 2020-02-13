@@ -20,7 +20,7 @@ Test cd
 cd with argument, and cd without argument
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test cd PASSED (10 of 10)
@@ -34,7 +34,7 @@ Test badcd
 cd to a bad directory
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test badcd PASSED (5 of 5)
@@ -48,7 +48,7 @@ Test exec
 path should be /bin
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test exec PASSED (5 of 5)
@@ -62,7 +62,7 @@ Test badexec
 run programs that do not exist in /bin
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test badexec PASSED (5 of 5)
@@ -76,7 +76,7 @@ Test path
 run path and a program that exists in a given path
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test path PASSED (5 of 5)
@@ -90,7 +90,7 @@ Test path2
 run path with a long pathname and many different paths
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test path2 PASSED (5 of 5)
@@ -104,7 +104,7 @@ Test line
 line with maximum allowed length
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test line PASSED (5 of 5)
@@ -118,7 +118,7 @@ Test whitespace
 leading and trailing whitespace, full whitespaces or empty string
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test whitespace PASSED (5 of 5)
@@ -132,7 +132,7 @@ Test rdr
 simple redirection with no standard error
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test rdr PASSED (10 of 10)
@@ -146,7 +146,7 @@ Test rdr2
 simple redirection with standard error
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test rdr2 PASSED (5 of 5)
@@ -160,7 +160,7 @@ Test par
 running commands in parallel
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test par PASSED (5 of 5)
@@ -174,7 +174,7 @@ Test mul
 running multiple commands at once
 
 **********************************************************************
-/tmp/tmpoCZ30j/p/./smash
+/tmp/tmp5Dhdrs/p/./smash
 
 
 test mul PASSED (5 of 5)
