@@ -20,7 +20,7 @@ Test cd
 cd with argument, and cd without argument
 
 **********************************************************************
-/tmp/tmpSvtAJI/p/./smash
+/tmp/tmpJrgGwq/p/./smash
 Failure: ./smash gave incorrect standard output.
 Expected: "smash> smash> _\na\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\nsmash> smash> _\na\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\nsmash>"Got:      "_\na\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\n_\na\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\nsmash> smash> smash> smash> smash> smash> smash> smash> smash> smash> smash>"
 

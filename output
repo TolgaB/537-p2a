@@ -1,2 +1,9 @@
-ls: invalid option -- 'y'
-Try 'ls --help' for more information.
+cd.txt
+exec.txt
+hi
+output
+runtests.log
+smash
+smash.c
+temp.txt
+test
