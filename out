@@ -1,13 +1,20 @@
-a.out
-cd.txt
-exec.txt
-hi
-out
-output
-path.txt
-runtests.log
-secout
-smash
-smash.c
-temp.txt
-test
+total 106
+drwxrwxr-x 4 tolga tolga  2048 Feb 13 18:48 .
+drwxrwxr-x 5 tolga tolga  2048 Feb 12 22:38 ..
+-rwxrwxr-x 1 tolga tolga 16296 Feb 10 13:51 .__afs48FB
+-rwxrwxr-x 1 tolga tolga  8656 Feb 10 10:12 .__afs7573
+-rwxrwxr-x 1 tolga tolga 18912 Feb 13 14:05 a.out
+-rw-rw-r-- 1 tolga tolga    20 Feb 12 15:57 cd.txt
+-rw-rw-r-- 1 tolga tolga    36 Feb 12 15:10 exec.txt
+drwxrwxr-x 8 tolga tolga  2048 Feb 13 15:25 .git
+-rw-rw-r-- 1 tolga tolga    22 Feb 12 22:04 hi
+-rw-rw-r-- 1 tolga tolga     0 Feb 13 18:48 out
+-rw-rw-r-- 1 tolga tolga    47 Feb 13 18:33 output
+-rw-rw-r-- 1 tolga tolga    70 Feb 13 01:56 path.txt
+-rw-rw-r-- 1 tolga tolga  4960 Feb 13 15:25 runtests.log
+-rw-rw-r-- 1 tolga tolga    93 Feb 13 12:58 secout
+-rwxrwxr-x 1 tolga tolga 18872 Feb 13 18:48 smash
+-rw-rw-r-- 1 tolga tolga 10655 Feb 13 18:48 smash.c
+-rw------- 1 tolga tolga 12288 Feb 12 22:37 .swp
+-rw-rw-r-- 1 tolga tolga    19 Feb 12 16:00 temp.txt
+drwxrwxr-x 2 tolga tolga  2048 Feb 10 22:16 test

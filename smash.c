@@ -62,52 +62,12 @@ int getInput(FILE *fp, int batchMode) {
                 while ((cmdToken = strsep(&lineCopy, ";")) != NULL) {
                         //take out the whitespaces
                         removeWhiteSpace(cmdToken);
-                        int outputToFile = 0;
-                        int incorrectInput = 0;
-                        //look for redirection
-                        int redPlace = 0;
-                        char **redArr = malloc(sizeof(char *) * strlen(cmdToken));
-                        char *redToken;
-                        while ((redToken = strsep(&cmdToken,">"))) {
-                                if (redPlace >= 2) {
-                                        //wont be able to leave the func?
-                                        incorrectInput = 1;
-                                        throwErr(0);
-                                }
-                                redArr[redPlace] = removeWhiteSpace(redToken);
-                                redPlace++;
-                        }
-                        if (incorrectInput) continue;
-
-                        char *outputFileName;
-                        //make sure that only one file is given if output
-                        if (redPlace > 1) {
-                                //we now know that all outputs should go to specified file
-                                outputToFile = 1;
-                                //make sure that there is only one output file
-                                //TODO: is more then one output file an end prog error?
-                                char *outputCopy = strdup(redArr[1]);
-                                char *outputToken;
-                                int num = 0;
-                                while ((outputToken = strsep(&outputCopy, " "))) {
-                                        outputFileName = outputToken;
-                                        num++;
-                                }
-                                if (num > 1) {
-                                        incorrectInput = 1;
-                                }
-                        }
-
-                        if (incorrectInput) {
-                                throwErr(0);
-                                continue;
-                        }
 
                         //now look for & statements
                         int secPlace = 0;
-                        char **parArr = malloc(sizeof(char *) * strlen(redArr[0]));
+                        char **parArr = malloc(sizeof(char *) * strlen(cmdToken));
                         char *parToken;
-                        while ((parToken = strsep(&redArr[0],"&"))) {
+                        while ((parToken = strsep(&cmdToken,"&"))) {
                                 parArr[secPlace] = removeWhiteSpace(parToken);
                                 secPlace++;
                         }
@@ -116,11 +76,54 @@ int getInput(FILE *fp, int batchMode) {
                         int builtin = 0;
                         //need to loop through parArr
                         for (int i = 0; i < secPlace;i++) {
+
+				//parse redirection
+				int outputToFile = 0;
+                       		int incorrectInput = 0;
+                        	//look for redirection
+                       		int redPlace = 0;
+                        	char **redArr = malloc(sizeof(char *) * strlen(parArr[i]));
+                        	char *redToken;
+                        	while ((redToken = strsep(&parArr[i],">"))) {
+                                	if (redPlace >= 2) {
+                                        	//wont be able to leave the func?
+                                        	incorrectInput = 1;
+                                        	throwErr(0);
+                                	}
+                                	redArr[redPlace] = removeWhiteSpace(redToken);
+                                	redPlace++;
+                        	}
+                        	if (incorrectInput) {
+					throwErr(0);
+					getInput(fp,builtin);
+				}
+                        	char *outputFileName;
+                        	//make sure that only one file is given if output
+                        	if (redPlace > 1) {
+                                	//we now know that all outputs should go to specified file
+                                	outputToFile = 1;
+                                	//make sure that there is only one output file
+                                	//TODO: is more then one output file an end prog error?
+                                	char *outputCopy = strdup(redArr[1]);
+                                	char *outputToken;
+                                	int num = 0;
+                                	while ((outputToken = strsep(&outputCopy, " "))) {
+                                        	outputFileName = outputToken;
+                                        	num++;
+                                	}
+                                	if (num > 1) {
+                                        	incorrectInput = 1;
+                                	}
+                        	}
+                        	if (incorrectInput) {
+                               		throwErr(0);
+                                	getInput(fp,builtin);
+                        	}
                                 //now we run parse the commands and run them
                                 int place = 0;
-                                char **inputArr = malloc(sizeof(char *) * strlen(parArr[i]));
+                                char **inputArr = malloc(sizeof(char *) * strlen(redArr[0]));
                                 char *token;
-                                while ((token = strsep(&parArr[i], " ")) != NULL) {
+                                while ((token = strsep(&redArr[0], " ")) != NULL) {
                                         inputArr[place] = token;
                                         place++;
                                 }
@@ -138,9 +141,6 @@ int getInput(FILE *fp, int batchMode) {
                                         if (rc == 0) {
                                                 //the child process 
 						//only redirect leftmost
-						if (i != (secPlace-1)) {
-								outputToFile = 0;
-						}
                                                 parseCommand(inputArr,place,outputToFile, outputFileName);
                                         }
                                 }
