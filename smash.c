@@ -60,14 +60,19 @@ int getInput(FILE *fp, int batchMode) {
                 char *cmdToken;
                 //commands that are run one after the other
                 while ((cmdToken = strsep(&lineCopy, ";")) != NULL) {
-                        //take out the whitespaces
+			//take out the whitespaces
                         removeWhiteSpace(cmdToken);
-
+			if (strcmp(cmdToken,"\n") == 0) {
+                                break;
+                        }
                         //now look for & statements
                         int secPlace = 0;
                         char **parArr = malloc(sizeof(char *) * strlen(cmdToken));
                         char *parToken;
                         while ((parToken = strsep(&cmdToken,"&"))) {
+				if (strcmp(parToken,"") == 0) {
+					break;
+				}
                                 parArr[secPlace] = removeWhiteSpace(parToken);
                                 secPlace++;
                         }
@@ -95,11 +100,16 @@ int getInput(FILE *fp, int batchMode) {
                         	}
                         	if (incorrectInput) {
 					throwErr(0);
-					getInput(fp,builtin);
+					break;
 				}
                         	char *outputFileName;
                         	//make sure that only one file is given if output
                         	if (redPlace > 1) {
+					//make sure the cmd exists
+					if (strcmp(redArr[0],"") == 0) {
+						throwErr(0);
+						break;
+					}
                                 	//we now know that all outputs should go to specified file
                                 	outputToFile = 1;
                                 	//make sure that there is only one output file
@@ -117,7 +127,7 @@ int getInput(FILE *fp, int batchMode) {
                         	}
                         	if (incorrectInput) {
                                		throwErr(0);
-                                	getInput(fp,builtin);
+                                	break;
                         	}
                                 //now we run parse the commands and run them
                                 int place = 0;
